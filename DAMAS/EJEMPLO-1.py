@@ -1,35 +1,26 @@
-# ==========================================
-# PROYECTO: JUEGO DE DAMAS
-# Estructura de Datos
-# ==========================================
-
-
 class Ficha:
 
   def __init__(self, jugador):
-    self.jugador = jugador  # 'o' (claras) o 'x' (oscuras)
-    self.es_dama = False  # Cambia a True al llegar al extremo opuesto
+    self.jugador = jugador
+    self.es_dama = False
 
   def coronar(self):
     self.es_dama = True
 
   def __str__(self):
-    # Si es Dama se imprime en mayúscula ('O' o 'X')
     return self.jugador.upper() if self.es_dama else self.jugador
 
 
 class Tablero:
 
   def __init__(self):
-    # FASE 1: Matriz de 8x8 inicializada con None
     self.grid = [[None for _ in range(8)] for _ in range(8)]
-    # FASE 2: Posicionamiento inicial de fichas
     self.acomodar_fichas()
 
-    def acomodar_fichas(self):
+  def acomodar_fichas(self):
     for i in range(8):
       for j in range(8):
-        if (i + j) % 2 != 0:  # Casillas oscuras del tablero
+        if (i + j) % 2 != 0:
           if i < 3:
             self.grid[i][j] = Ficha("o")
           elif i > 4:
@@ -52,14 +43,12 @@ class Tablero:
 
     print(linea_separadora + "\n")
 
-  # FASE 4: Verificar si el jugador actual tiene capturas obligatorias
   def obtener_capturas_posibles(self, jugador):
     capturas = []
     for f in range(8):
       for c in range(8):
         pieza = self.grid[f][c]
         if pieza is not None and pieza.jugador == jugador:
-          # Direcciones de movimiento según tipo de ficha
           direcciones = (
               [(-1, -1), (-1, 1), (1, -1), (1, 1)]
               if pieza.es_dama
@@ -82,14 +71,11 @@ class Tablero:
                 capturas.append((f, c, f_dest, c_dest))
     return capturas
 
-  # FASE 3 Y 4: Mover ficha y ejecutar capturas
   def mover(self, f_o, c_o, f_d, c_d, jugador_actual, forzado=None):
-    # 1. Validar límites de la matriz
     if not (0 <= f_o < 8 and 0 <= c_o < 8 and 0 <= f_d < 8 and 0 <= c_d < 8):
       print("Error: Las coordenadas deben estar entre 0 y 7.")
       return False, False
 
-    # 0. Si venimos de una captura en cadena, obligar a seguir con la MISMA ficha
     if forzado is not None and (f_o, c_o) != forzado:
       print(
           f"Error: Debes continuar comiendo con la ficha en {forzado},"
@@ -99,12 +85,10 @@ class Tablero:
 
     pieza = self.grid[f_o][c_o]
 
-    # 2. Validar que la celda origen tenga ficha propia
     if pieza is None or pieza.jugador != jugador_actual:
       print("Error: No hay una ficha tuya en la casilla de origen.")
       return False, False
 
-    # 3. Validar casilla destino vacía
     if self.grid[f_d][c_d] is not None:
       print("Error: La casilla de destino ya está ocupada.")
       return False, False
@@ -112,9 +96,7 @@ class Tablero:
     diff_f = f_d - f_o
     diff_c = c_d - c_o
 
-    # REGLA: Obligación de comer
     capturas_disponibles = self.obtener_capturas_posibles(jugador_actual)
-    # Si venimos de una cadena, la obligación se restringe a esa ficha
     if forzado is not None:
       capturas_disponibles = [
           cap for cap in capturas_disponibles
@@ -129,10 +111,8 @@ class Tablero:
       )
       return False, False
 
-    # CASO A: Movimiento Simple (1 paso diagonal)
     if abs(diff_f) == 1 and abs(diff_c) == 1:
       if forzado is not None:
-        # Ya estábamos en cadena de captura: no se permite un paso simple
         print("Error: Debes seguir comiendo, no puedes hacer un paso simple.")
         return False, False
 
@@ -144,13 +124,11 @@ class Tablero:
           print("Error: Las fichas normales 'x' solo suben.")
           return False, False
 
-      # Ejecutar movimiento simple
       self.grid[f_d][c_d] = pieza
       self.grid[f_o][c_o] = None
       self._evaluar_coronacion(f_d, c_d, pieza)
       return True, False
 
-    # CASO B: Captura de Ficha (2 pasos diagonales)
     elif es_captura:
       f_medio = f_o + (diff_f // 2)
       c_medio = c_o + (diff_c // 2)
@@ -168,13 +146,10 @@ class Tablero:
           print("Error: Dirección de captura no válida para ficha normal 'x'.")
           return False, False
 
-      # Ejecutar captura
       self.grid[f_d][c_d] = pieza
       self.grid[f_o][c_o] = None
-      self.grid[f_medio][c_medio] = None  # Elimina la ficha comida
-      self._evaluar_coronacion(f_d, c_d, pieza)
+      self.grid[f_medio][c_medio] = None
 
-      # Verificar si puede seguir comiendo en cadena CON LA MISMA FICHA
       otra_captura = any(
           cap[0] == f_d and cap[1] == c_d
           for cap in self.obtener_capturas_posibles(jugador_actual)
@@ -185,7 +160,6 @@ class Tablero:
       print("Error: Movimiento no permitido.")
       return False, False
 
-  # FASE 4: Coronación a Dama
   def _evaluar_coronacion(self, fila, col, pieza):
     if not pieza.es_dama:
       if (pieza.jugador == "o" and fila == 7) or (
@@ -197,7 +171,6 @@ class Tablero:
             " Dama."
         )
 
-  # FASE 5: Evaluar Fin del Juego
   def contar_fichas(self, jugador):
     cant = 0
     for f in range(8):
@@ -207,20 +180,14 @@ class Tablero:
     return cant
 
 
-# ==========================================
-# BUCLE PRINCIPAL DE JUEGO
-# ==========================================
-
-
 def jugar():
   juego = Tablero()
   jugador_actual = "o"
-  forzado = None  # Casilla (fila, col) de la ficha que debe seguir comiendo
+  forzado = None
 
   while True:
     juego.mostrar_tablero()
 
-    # FASE 5: Comprobar condición de victoria por fichas agotadas
     if juego.contar_fichas("o") == 0:
       print("¡EL JUGADOR 'x' HA GANADO! 'o' se ha quedado sin fichas.")
       break
@@ -248,8 +215,6 @@ def jugar():
     )
 
     if exito:
-      # Si comió una ficha y puede seguir comiendo con la misma pieza,
-      # no se cambia el turno y se OBLIGA a continuar con esa ficha
       if puede_repetir:
         forzado = (f_d, c_d)
         print("¡Tienes otro salto disponible! Debes seguir comiendo.")
