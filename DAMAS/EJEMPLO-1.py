@@ -14,7 +14,7 @@ class Ficha:
 class Tablero:
 
   def __init__(self):
-    self.grid = [[None for _ in range(8)] for _ in range(8)]
+    self.tablero = [[None for _ in range(8)] for _ in range(8)]
     self.acomodar_fichas()
 
   def acomodar_fichas(self):
@@ -22,9 +22,9 @@ class Tablero:
       for j in range(8):
         if (i + j) % 2 != 0:
           if i < 3:
-            self.grid[i][j] = Ficha("o")
+            self.tablero[i][j] = Ficha("o")
           elif i > 4:
-            self.grid[i][j] = Ficha("x")
+            self.tablero[i][j] = Ficha("x")
 
   def mostrar_tablero(self):
     print("\n     0     1     2     3     4     5     6     7")
@@ -34,7 +34,7 @@ class Tablero:
       print(linea_separadora)
       contenido_fila = f"{fila} |"
       for col in range(8):
-        pieza = self.grid[fila][col]
+        pieza = self.tablero[fila][col]
         if pieza is None:
           contenido_fila += "     |"
         else:
@@ -47,7 +47,7 @@ class Tablero:
     capturas = []
     for f in range(8):
       for c in range(8):
-        pieza = self.grid[f][c]
+        pieza = self.tablero[f][c]
         if pieza is not None and pieza.jugador == jugador:
           direcciones = (
               [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -60,8 +60,8 @@ class Tablero:
             f_dest, c_dest = f + (2 * df), c + (2 * dc)
 
             if 0 <= f_dest < 8 and 0 <= c_dest < 8:
-              pieza_medio = self.grid[f_medio][c_medio]
-              pieza_dest = self.grid[f_dest][c_dest]
+              pieza_medio = self.tablero[f_medio][c_medio]
+              pieza_dest = self.tablero[f_dest][c_dest]
 
               if (
                   pieza_medio is not None
@@ -83,13 +83,13 @@ class Tablero:
       )
       return False, False
 
-    pieza = self.grid[f_o][c_o]
+    pieza = self.tablero[f_o][c_o]
 
     if pieza is None or pieza.jugador != jugador_actual:
       print("Error: No hay una ficha tuya en la casilla de origen.")
       return False, False
 
-    if self.grid[f_d][c_d] is not None:
+    if self.tablero[f_d][c_d] is not None:
       print("Error: La casilla de destino ya está ocupada.")
       return False, False
 
@@ -124,15 +124,15 @@ class Tablero:
           print("Error: Las fichas normales 'x' solo suben.")
           return False, False
 
-      self.grid[f_d][c_d] = pieza
-      self.grid[f_o][c_o] = None
+      self.tablero[f_d][c_d] = pieza
+      self.tablero[f_o][c_o] = None
       self._evaluar_coronacion(f_d, c_d, pieza)
       return True, False
 
     elif es_captura:
       f_medio = f_o + (diff_f // 2)
       c_medio = c_o + (diff_c // 2)
-      pieza_medio = self.grid[f_medio][c_medio]
+      pieza_medio = self.tablero[f_medio][c_medio]
 
       if pieza_medio is None or pieza_medio.jugador == jugador_actual:
         print("Error: No hay una ficha rival para capturar en el trayecto.")
@@ -146,9 +146,9 @@ class Tablero:
           print("Error: Dirección de captura no válida para ficha normal 'x'.")
           return False, False
 
-      self.grid[f_d][c_d] = pieza
-      self.grid[f_o][c_o] = None
-      self.grid[f_medio][c_medio] = None
+      self.tablero[f_d][c_d] = pieza
+      self.tablero[f_o][c_o] = None
+      self.tablero[f_medio][c_medio] = None
 
       otra_captura = any(
           cap[0] == f_d and cap[1] == c_d
@@ -175,7 +175,7 @@ class Tablero:
     cant = 0
     for f in range(8):
       for c in range(8):
-        if self.grid[f][c] is not None and self.grid[f][c].jugador == jugador:
+        if self.tablero[f][c] is not None and self.tablero[f][c].jugador == jugador:
           cant += 1
     return cant
 
