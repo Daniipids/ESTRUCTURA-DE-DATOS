@@ -1,0 +1,75 @@
+
+
+
+from turtle import color
+
+
+#Damas
+
+class tablero:
+    def __init__(self):
+        self.inicio = [[""for _ in range(8)] for _ in range(8)]
+        self.acomodar_fichas()
+
+    def acomodar_fichas(self):
+        for i in range(8):
+            for j in range(8):
+                if (i + j) % 2 != 0:
+                    if i < 3:
+                        self.inicio[i][j] = ficha("o")
+                    elif i > 4:
+                        self.inicio[i][j] = ficha("x")
+    def mostrar_tablero(self):
+        for fila in self.inicio:
+            for celda in fila:
+                if celda == "":
+                    print(" . ", end="")
+                else:
+                    print(f" {celda.jugador} ", end="")
+            print()
+class ficha:
+    def __init__(self, jugador):
+        self.jugador = jugador
+        self.reina = False
+
+    def coronar(self):
+        self.reina = True
+        print(f"La ficha {self.jugador} ha sido coronada y ahora es una reina.")
+
+
+mi_juego = tablero()
+mi_juego.mostrar_tablero()
+
+ficha1 = ficha("o")
+ficha2 = ficha("x")
+
+
+turno = 0
+while True:
+    if turno % 2 == 0:
+        jugador_actual = ficha1
+    else:
+        jugador_actual = ficha2
+
+    print(f"Turno del jugador {jugador_actual.jugador}")
+    fila_origen = int(input("Ingrese la fila de origen (0-7): "))
+    columna_origen = int(input("Ingrese la columna de origen (0-7): "))
+    fila_destino = int(input("Ingrese la fila de destino (0-7): "))
+    columna_destino = int(input("Ingrese la columna de destino (0-7): "))
+
+
+
+
+
+
+    # Aquí se puede agregar la lógica para mover las fichas y verificar si se puede coronar
+    # Por simplicidad, solo se muestra el movimiento sin validación
+    mi_juego.inicio[fila_destino][columna_destino] = mi_juego.inicio[fila_origen][columna_origen]
+    mi_juego.inicio[fila_origen][columna_origen] = ""
+
+    # Verificar si la ficha debe ser coronada
+    if (jugador_actual.jugador == "o" and fila_destino == 7) or (jugador_actual.jugador == "x" and fila_destino == 0):
+        jugador_actual.coronar()
+
+    mi_juego.mostrar_tablero()
+    turno += 1
